@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.mine_diver.fabrifine.config.Config;
 import net.mine_diver.fabrifine.config.OFConfig;
 import net.mine_diver.fabrifine.config.OptionsListener;
+import net.mine_diver.fabrifine.render.OFGameRenderer;
 import net.minecraft.block.BlockBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.options.GameOptions;
@@ -114,6 +115,14 @@ public class MixinGameOptions implements OFConfig {
             ofKeyBindZoom;
 
     @Inject(
+            method = "<init>(Lnet/minecraft/client/Minecraft;Ljava/io/File;)V",
+            at = @At("RETURN")
+    )
+    private void setOptions(Minecraft minecraft, File file, CallbackInfo ci) {
+        Config.setGameSettings((GameOptions) (Object) this);
+    }
+
+    @Inject(
             method = "load()V",
             at = @At("HEAD")
     )
@@ -175,7 +184,7 @@ public class MixinGameOptions implements OFConfig {
 
     @Unique
     private void updateWorldLightLevels() {
-//        if (this.minecraft.gameRenderer != null) this.minecraft.gameRenderer.updateWorldLightLevels();
+        if (this.minecraft.gameRenderer != null) OFGameRenderer.of(this.minecraft.gameRenderer).updateWorldLightLevels();
         if (this.minecraft.worldRenderer != null) this.minecraft.worldRenderer.method_1537();
     }
 
@@ -581,6 +590,19 @@ public class MixinGameOptions implements OFConfig {
         else cir.setReturnValue(s + "Default");
         else if (arg == OptionsListener.getCLEAR_WATER()) if (this.ofClearWater) cir.setReturnValue(s + "ON");
         else cir.setReturnValue(s + "OFF");
+    }
+
+    @Inject(
+            method = "load()V",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/options/GameOptions;fpsLimit:I",
+                    opcode = Opcodes.PUTFIELD,
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void initVSync(CallbackInfo ci) {
+        Display.setVSyncEnabled(fpsLimit == 3);
     }
 
     @Inject(

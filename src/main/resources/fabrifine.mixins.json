@@ -6,7 +6,11 @@
   "mixins": [
     "BlockBaseAccessor",
     "ButtonAccessor",
+    "LevelAccessor",
+    "MixinBlockRenderer",
     "MixinGameOptions",
+    "MixinGameRenderer",
+    "MixinStationBlockRenderer",
     "MixinVideoSettings",
     "TessellatorAccessor"
   ],
