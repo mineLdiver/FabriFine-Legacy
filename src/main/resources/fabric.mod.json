@@ -1,42 +1,32 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "fabrifine",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "OptiFine",
+  "description": "OptiFine is a Minecraft optimization mod.",
   "authors": [
-    "Me!"
+    "sp614x",
+    "historian",
+    "mine_diver"
   ],
   "contact": {
     "homepage": "https://glass-launcher.net/",
-    "sources": "https://github.com/calmilamsy/BIN-fabric-example-mod"
+    "sources": "https://github.com/mineLdiver/FabriFine",
+    "issues": "https://github.com/mineLdiver/FabriFine/issues"
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/examplemod/icon.png",
+  "icon": "assets/fabrifine/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
-    "stationapi:event_bus": [
-      "net.glasslauncher.example.events.init.AchievementListener",
-      "net.glasslauncher.example.events.init.BlockListener",
-      "net.glasslauncher.example.events.init.ItemListener",
-      "net.glasslauncher.example.events.init.PlayerHandlerListener",
-      "net.glasslauncher.example.events.init.RecipeListener"
-    ],
     "stationapi:event_bus_client": [
-      "net.glasslauncher.example.events.init.ModelListener",
-      "net.glasslauncher.example.events.init.KeyBindingListener",
-      "net.glasslauncher.example.events.init.TextureListener",
-      "net.glasslauncher.example.events.ingame.KeyPressedListener"
-    ],
-    "stationapi:event_bus_server": [
-      "net.glasslauncher.example.events.init.ServerInitListener"
+      "net.mine_diver.fabrifine.config.OptionsListener"
     ]
   },
   "mixins": [
-    "examplemod.mixins.json"
+    "fabrifine.mixins.json"
   ],
 
   "depends": {
