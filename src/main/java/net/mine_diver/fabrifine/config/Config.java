@@ -535,7 +535,8 @@ public class Config {
     
     public static void sleep(final long ms) {
         try {
-//            Thread.currentThread();
+            //noinspection ResultOfMethodCallIgnored
+            Thread.currentThread();
             Thread.sleep(ms);
         }
         catch (InterruptedException e) {

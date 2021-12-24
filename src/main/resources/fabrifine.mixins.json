@@ -7,11 +7,17 @@
     "BlockBaseAccessor",
     "ButtonAccessor",
     "LevelAccessor",
+    "LivingAccessor",
     "MixinBlockRenderer",
+    "Mixinclass_573",
+    "Mixinclass_66",
+    "Mixinclass_84",
     "MixinGameOptions",
     "MixinGameRenderer",
     "MixinStationBlockRenderer",
+    "MixinTessellator",
     "MixinVideoSettings",
+    "MixinWorldRenderer",
     "TessellatorAccessor"
   ],
   "injectors": {

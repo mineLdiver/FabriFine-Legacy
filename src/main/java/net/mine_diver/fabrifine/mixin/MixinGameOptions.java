@@ -6,6 +6,7 @@ import net.mine_diver.fabrifine.config.Config;
 import net.mine_diver.fabrifine.config.OFConfig;
 import net.mine_diver.fabrifine.config.OptionsListener;
 import net.mine_diver.fabrifine.render.OFGameRenderer;
+import net.mine_diver.fabrifine.render.OFWorldRenderer;
 import net.minecraft.block.BlockBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.options.GameOptions;
@@ -243,7 +244,7 @@ public class MixinGameOptions implements OFConfig {
             )
     )
     private void redirectRenderRefresh(WorldRenderer worldRenderer) {
-//        worldRenderer.setAllRenderesVisible();
+        OFWorldRenderer.of(worldRenderer).setAllRenderesVisible();
     }
 
     @Redirect(

@@ -21,6 +21,9 @@
 
   "environment": "client",
   "entrypoints": {
+    "mm:early_risers": [
+      "net.mine_diver.fabrifine.asm.ASMPlugin"
+    ],
     "stationapi:event_bus_client": [
       "net.mine_diver.fabrifine.config.OptionsListener"
     ]
