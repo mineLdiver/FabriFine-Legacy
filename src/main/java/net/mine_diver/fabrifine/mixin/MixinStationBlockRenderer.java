@@ -5,7 +5,6 @@ import net.minecraft.client.render.Tessellator;
 import net.modificationstation.stationapi.api.client.texture.atlas.Atlas;
 import net.modificationstation.stationapi.impl.client.texture.StationBlockRenderer;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -63,32 +62,16 @@ public abstract class MixinStationBlockRenderer {
 
     //TODO: fix stuff below
 
-    @Redirect(
-            method = "prepareTessellator",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/modificationstation/stationapi/mixin/render/client/TessellatorAccessor;getDrawing()Z",
-                    ordinal = 1
-            )
-    )
-    private boolean endIfRunning(net.modificationstation.stationapi.mixin.render.client.TessellatorAccessor instance) {
-        capturedDrawing = instance.getDrawing();
-        return false;
-    }
-
-    @Unique
-    private boolean capturedDrawing;
-
-    @Redirect(
-            method = "prepareTessellator",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/render/Tessellator;start()V",
-                    ordinal = 1
-            )
-    )
-    private void start(Tessellator instance) {
-        if (!capturedDrawing)
-            instance.start();
-    }
+//    @Inject(
+//            method = "prepareTessellator",
+//            at = @At(
+//                    value = "INVOKE",
+//                    target = "Lnet/minecraft/client/render/Tessellator;start()V",
+//                    ordinal = 1
+//            ),
+//            locals = LocalCapture.CAPTURE_FAILHARD
+//    )
+//    private void start(Atlas atlas, CallbackInfoReturnable<Tessellator> cir, Tessellator tessellator, TessellatorAccessor tessellatorAccessor, boolean drawing) {
+//        if (draw)
+//    }
 }

@@ -705,15 +705,16 @@ public abstract class MixinTessellator implements OFTessellator {
     @Unique
     private byte nx, ny, nz;
 
-    @Redirect(
+    @Inject(
             method = "setNormal(FFF)V",
             at = @At(
                     value = "FIELD",
                     target = "Lnet/minecraft/client/render/Tessellator;normal:I",
-                    opcode = Opcodes.PUTFIELD
+                    opcode = Opcodes.PUTFIELD,
+                    shift = At.Shift.AFTER
             )
     )
-    private void setNormal(Tessellator instance, int value) {
+    private void setNormal(float f1, float f2, float par3, CallbackInfo ci) {
         if(!renderingChunk) {
             GL11.glNormal3b(nx, ny, nz);
         } else {
