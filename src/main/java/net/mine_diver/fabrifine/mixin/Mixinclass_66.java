@@ -6,6 +6,7 @@ import net.mine_diver.fabrifine.config.Config;
 import net.mine_diver.fabrifine.render.IUpdateListener;
 import net.mine_diver.fabrifine.render.OFCamera;
 import net.mine_diver.fabrifine.render.OFMeshRenderer;
+import net.mine_diver.fabrifine.render.OFTessellator;
 import net.minecraft.class_66;
 import net.minecraft.class_68;
 import net.minecraft.client.render.Tessellator;
@@ -206,7 +207,7 @@ public abstract class Mixinclass_66 implements OFMeshRenderer {
             )
     )
     private void setRenderingChunk(CallbackInfo ci) {
-//        Tessellator.INSTANCE.setRenderingChunk(true);
+        OFTessellator.of(Tessellator.INSTANCE).setRenderingChunk(true);
     }
 
     @Redirect(
@@ -262,7 +263,7 @@ public abstract class Mixinclass_66 implements OFMeshRenderer {
             )
     )
     private void setRenderingChunk2(CallbackInfo ci) {
-//        Tessellator.INSTANCE.setRenderingChunk(false);
+        OFTessellator.of(Tessellator.INSTANCE).setRenderingChunk(false);
     }
 
     @Inject(

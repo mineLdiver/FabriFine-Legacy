@@ -10,9 +10,11 @@ public class ASMPlugin implements Runnable {
     public void run() {
         ClassTinkerers.addTransformation("net.minecraft.class_66", classNode -> {
             for (FieldNode fieldNode : classNode.fields)
-                if (fieldNode.name.equals("field_249")) {
-                    fieldNode.access |= Opcodes.ACC_VOLATILE;
-                    break;
+                switch (fieldNode.name) {
+                    case "field_230":
+                    case "field_249":
+                        fieldNode.access |= Opcodes.ACC_VOLATILE;
+                        break;
                 }
         });
         ClassTinkerers.addTransformation("net.minecraft.client.render.Tessellator", classNode -> {

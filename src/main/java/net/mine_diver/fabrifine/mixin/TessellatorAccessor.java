@@ -17,4 +17,7 @@ public interface TessellatorAccessor {
     static void setINSTANCE(Tessellator instance) {
         throw new AssertionError("Mixin!");
     }
+
+    @Accessor
+    boolean getDrawing();
 }

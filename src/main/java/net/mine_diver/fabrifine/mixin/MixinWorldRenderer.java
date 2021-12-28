@@ -3,7 +3,7 @@ package net.mine_diver.fabrifine.mixin;
 import net.mine_diver.fabrifine.config.Config;
 import net.mine_diver.fabrifine.config.OFConfig;
 import net.mine_diver.fabrifine.render.OFMeshRenderer;
-import net.mine_diver.fabrifine.render.OFTessellator;
+import net.mine_diver.fabrifine.render.OFTessellatorFields;
 import net.mine_diver.fabrifine.render.OFWorldRenderer;
 import net.mine_diver.fabrifine.render.UpdateThread;
 import net.minecraft.class_66;
@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -55,6 +56,9 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
     @Shadow private int field_1810;
     @Shadow private List field_1807;
     @Shadow private class_66[] field_1809;
+
+    private static final double CLOUD_OFFSET = 0.02;
+
     @Unique
     private long lastMovedTime = System.currentTimeMillis();
     @Unique
@@ -124,6 +128,19 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
         this.prevReposY = -9999.0;
         this.prevReposZ = -9999.0;
         return numBlocks;
+    }
+
+    @Redirect(
+            method = "method_1537()V",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/class_66;field_249:Z",
+                    opcode = Opcodes.PUTFIELD
+            )
+    )
+    private void nullCheck(class_66 instance, boolean value) {
+        if (instance != null)
+            instance.field_249 = value;
     }
 
     @Redirect(
@@ -207,10 +224,9 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
         int e = (int)player.z;
         char x = 'ߐ';
 
-        // TODO: TESSELLATOR MIXIN!
-        if ((Math.abs(s - OFTessellator.chunkOffsetX) > x) || (Math.abs(e - OFTessellator.chunkOffsetZ) > x)) {
-            OFTessellator.chunkOffsetX = s;
-            OFTessellator.chunkOffsetZ = e;
+        if ((Math.abs(s - OFTessellatorFields.chunkOffsetX) > x) || (Math.abs(e - OFTessellatorFields.chunkOffsetZ) > x)) {
+            OFTessellatorFields.chunkOffsetX = s;
+            OFTessellatorFields.chunkOffsetZ = e;
             method_1537();
         }
         int l = 0;
@@ -444,9 +460,9 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
     private void cancelTail(int j, int k, int d, double partialTicks, CallbackInfoReturnable<Integer> cir, int l) {
         this.field_22019_aY.flip();
         final Living entityliving = this.client.viewEntity;
-        final double partialX = entityliving.prevRenderX + (entityliving.x - entityliving.prevRenderX) * partialTicks - OFTessellator.chunkOffsetX;
+        final double partialX = entityliving.prevRenderX + (entityliving.x - entityliving.prevRenderX) * partialTicks - OFTessellatorFields.chunkOffsetX;
         final double partialY = entityliving.prevRenderY + (entityliving.y - entityliving.prevRenderY) * partialTicks;
-        final double partialZ = entityliving.prevRenderZ + (entityliving.z - entityliving.prevRenderZ) * partialTicks - OFTessellator.chunkOffsetZ;
+        final double partialZ = entityliving.prevRenderZ + (entityliving.z - entityliving.prevRenderZ) * partialTicks - OFTessellatorFields.chunkOffsetZ;
         GL11.glTranslatef((float)(-partialX), (float)(-partialY), (float)(-partialZ));
         GL11.glCallLists(this.field_22019_aY);
         GL11.glTranslatef((float)partialX, (float)partialY, (float)partialZ);
@@ -546,6 +562,214 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
         return value + OFConfig.of(client.options).getOfCloudsHeight() * 25;
     }
 
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 8
+            )
+    )
+    private double modifyCloudSize1(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 9
+            )
+    )
+    private double modifyCloudSize2(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 10
+            )
+    )
+    private double modifyCloudSize3(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 11
+            )
+    )
+    private double modifyCloudSize4(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 12
+            )
+    )
+    private double modifyCloudSize5(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 13
+            )
+    )
+    private double modifyCloudSize6(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 14
+            )
+    )
+    private double modifyCloudSize7(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 15
+            )
+    )
+    private double modifyCloudSize8(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 16
+            )
+    )
+    private double modifyCloudSize9(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 17
+            )
+    )
+    private double modifyCloudSize10(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 18
+            )
+    )
+    private double modifyCloudSize11(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 19
+            )
+    )
+    private double modifyCloudSize12(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 20
+            )
+    )
+    private double modifyCloudSize13(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 21
+            )
+    )
+    private double modifyCloudSize14(double original) {
+        return original - CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 22
+            )
+    )
+    private double modifyCloudSize15(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
+    @ModifyArg(
+            method = "renderClouds(F)V",
+            index = 1,
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/Tessellator;vertex(DDDDD)V",
+                    ordinal = 23
+            )
+    )
+    private double modifyCloudSize16(double original) {
+        return original + CLOUD_OFFSET;
+    }
+
     /**
      * @reason Notch code.
      * @author mine_diver
@@ -574,8 +798,7 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
                     if (!wr.field_249) {
                         //noinspection unchecked
                         this.field_1807.set(i, null);
-                    }
-                    else {
+                    } else {
                         float distSq = wr.method_299(living);
                         if (distSq <= 256.0f) {
                             if (this.isActingNow() || this.firstUpdate) {
@@ -605,8 +828,7 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
                             wrBest = wr;
                             distSqBest = distSq;
                             indexBest = i;
-                        }
-                        else if (distSq < distSqBest) {
+                        } else if (distSq < distSqBest) {
                             wrBest = wr;
                             distSqBest = distSq;
                             indexBest = i;
@@ -757,8 +979,68 @@ public abstract class MixinWorldRenderer implements OFWorldRenderer {
             ),
             cancellable = true
     )
-    private void cancelIfDisabled(String d, double d1, double d2, double d3, double d4, double d5, double par7, CallbackInfo ci) {
+    private void cancelSmoke(String d, double d1, double d2, double d3, double d4, double d5, double par7, CallbackInfo ci) {
         if (!Config.isAnimatedSmoke())
+            ci.cancel();
+    }
+
+    @Inject(
+            method = "addParticle(Ljava/lang/String;DDDDDD)V",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/render/WorldRenderer;level:Lnet/minecraft/level/Level;",
+                    opcode = Opcodes.GETFIELD,
+                    ordinal = 4
+            ),
+            cancellable = true
+    )
+    private void cancelExplosion(String d, double d1, double d2, double d3, double d4, double d5, double par7, CallbackInfo ci) {
+        if (!Config.isAnimatedExplosion())
+            ci.cancel();
+    }
+
+    @Inject(
+            method = "addParticle(Ljava/lang/String;DDDDDD)V",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/render/WorldRenderer;level:Lnet/minecraft/level/Level;",
+                    opcode = Opcodes.GETFIELD,
+                    ordinal = 5
+            ),
+            cancellable = true
+    )
+    private void cancelFire(String d, double d1, double d2, double d3, double d4, double d5, double par7, CallbackInfo ci) {
+        if (!Config.isAnimatedFlame())
+            ci.cancel();
+    }
+
+    @Inject(
+            method = "addParticle(Ljava/lang/String;DDDDDD)V",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/render/WorldRenderer;level:Lnet/minecraft/level/Level;",
+                    opcode = Opcodes.GETFIELD,
+                    ordinal = 9
+            ),
+            cancellable = true
+    )
+    private void cancelLargeSmoke(String d, double d1, double d2, double d3, double d4, double d5, double par7, CallbackInfo ci) {
+        if (!Config.isAnimatedSmoke())
+            ci.cancel();
+    }
+
+    @Inject(
+            method = "addParticle(Ljava/lang/String;DDDDDD)V",
+            at = @At(
+                    value = "FIELD",
+                    target = "Lnet/minecraft/client/render/WorldRenderer;level:Lnet/minecraft/level/Level;",
+                    opcode = Opcodes.GETFIELD,
+                    ordinal = 10
+            ),
+            cancellable = true
+    )
+    private void cancelRedstone(String d, double d1, double d2, double d3, double d4, double d5, double par7, CallbackInfo ci) {
+        if (!Config.isAnimatedRedstone())
             ci.cancel();
     }
 

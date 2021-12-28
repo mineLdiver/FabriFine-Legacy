@@ -1,8 +1,12 @@
 package net.mine_diver.fabrifine.render;
 
-public class OFTessellator {
+import net.minecraft.client.render.Tessellator;
 
-    private boolean renderingChunk;
-    public static int chunkOffsetX = 0;
-    public static int chunkOffsetZ = 0;
+public interface OFTessellator {
+
+    static OFTessellator of(Tessellator tessellator) {
+        return (OFTessellator) tessellator;
+    }
+
+    void setRenderingChunk(boolean renderingChunk);
 }
