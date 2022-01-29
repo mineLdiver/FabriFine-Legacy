@@ -46,6 +46,9 @@ repositories {
 		name = "Jitpack"
 		url "https://jitpack.io/"
 	}
+	maven {
+		url "https://maven.glass-launcher.net/snapshots"
+	}
 }
 
 minecraft {
@@ -67,12 +70,15 @@ dependencies {
 	implementation 'org.ow2.asm:asm-tree:9.0'
 	implementation 'org.ow2.asm:asm-util:9.0'
 
+	implementation "org.apache.commons:commons-lang3:3.5"
+	implementation "commons-io:commons-io:2.5"
 	implementation "com.github.jhalterman:typetools:${project.typetools_version}"
 	implementation "com.github.mineLdiver:expressions:${project.expressions_version}"
 	implementation "com.github.mineLdiver:UnsafeEvents:${project.unsafeevents_version}"
 	implementation "it.unimi.dsi:fastutil:${project.fastutil_version}"
 	//noinspection GradlePackageUpdate
 	implementation "com.github.ben-manes.caffeine:caffeine:${project.caffeine_version}"
+	implementation "com.mojang:datafixerupper:${project.dfu_version}"
 	implementation "com.github.Chocohead:Fabric-ASM:${project.fabricasm_version}"
 	include "com.github.Chocohead:Fabric-ASM:${project.fabricasm_version}"
 
@@ -91,9 +97,13 @@ dependencies {
 	// adds some useful annotations for miscellaneous uses. does not add any dependencies, though people without the lib will be missing some useful context hints.
 	compile 'org.jetbrains:annotations:16.0.2'
 
-	modImplementation "com.github.minecraft-cursed-legacy:cursed-fabric-loader:${project.loader_version}"
+	modImplementation("io.github.minecraft-cursed-legacy:cursed-fabric-loader:${project.loader_version}") {
+		transitive false
+	}
 
-	modImplementation "com.github.ModificationStation:StationAPI:${project.stapi_version}"
+	modImplementation("net.modificationstation:StationAPI:${project.stapi_version}") {
+		exclude module: 'cursed-fabric-loader'
+	}
 }
 
 processResources {
